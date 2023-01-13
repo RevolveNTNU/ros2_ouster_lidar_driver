@@ -5,9 +5,9 @@ ouster_driver:
     lidar_mode: "1024x20"
     imu_port: 7503
     lidar_port: 7502
-    sensor_frame: laser_sensor_frame
-    laser_frame: laser_data_frame
-    imu_frame: imu_data_frame
+    sensor_frame: base_link
+    laser_frame: os_sensor
+    imu_frame: os_imu
 
     # if False, data are published with sensor data QoS. This is preferrable
     # for production but default QoS is needed for rosbag.
