@@ -30,7 +30,7 @@ See design doc in `design/*` directory [here](ros2_ouster/design/design_doc.md).
 | `intensity_image`    | sensor_msgs/Image       | Image of the Intensity values from the sensor    |
 | `noise_image`        | sensor_msgs/Image       | Image of the noise values from the sensor        |
 | `reflectivity_image` | sensor_msgs/Image       | Image of the reflectivity values from the sensor |
-| `points`             | sensor_msgs/PointCloud2 | 3D Pointcloud generated from a 360 rotation      |
+| `sensor/lidar_0`             | sensor_msgs/PointCloud2 | 3D Pointcloud generated from a 360 rotation      |
 | `imu`                | sensor_msgs/Imu         | IMU values at transmission rate                  |
 
 | Service           | Type                    | Description                       |

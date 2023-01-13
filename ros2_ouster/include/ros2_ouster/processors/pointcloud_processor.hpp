@@ -71,7 +71,7 @@ public:
       ? std::make_unique<Cloud>(_width * _height, 1)
       : nullptr;
     _pub = _node->create_publisher<sensor_msgs::msg::PointCloud2>(
-      "points", qos);
+      "sensor/lidar_0", qos);
   }
 
   /**
