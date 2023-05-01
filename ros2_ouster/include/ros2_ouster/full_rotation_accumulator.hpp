@@ -21,6 +21,10 @@
 #include <vector>
 
 #include "ros2_ouster/exception.hpp"
+#include "rdv_vehicle_interface_base/timestamp_translator.h"
+#include <rdv_msgs/PpsCounterReset.h>
+#include "std_srvs/Trigger.h"
+
 
 namespace sensor
 {
@@ -73,6 +77,20 @@ public:
     if (!_batchReady) {
       throw ros2_ouster::OusterDriverException("Full rotation not accumulated.");
     }
+    
+    TimestampTranslator timestamp_translator {
+      {std::chrono::seconds{2}, 1,
+      TimestampTranslator::Method::kPpsToSystemClock}};
+      rclcpp::Client<rdv_msgs::PpsCounterReset>::SharedPtr pps_reset_client =
+         node->create_client<rdv_msgs::PpsCounterReset>("/vehicle_interface/reset_pps_counter");
+
+         bool has_reset_pps_counter{false};
+    }
+
+     ros::ServiceClient pps_reset_client =
+        nh.serviceClient<rdv_msgs::PpsCounterReset>(
+            "/vehicle_interface/reset_pps_counter");
+    bool has_reset_pps_counter{false};
 
     return _timestamp;
   }

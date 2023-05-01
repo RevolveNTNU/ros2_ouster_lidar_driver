@@ -22,6 +22,8 @@ find_package(pcl_conversions REQUIRED)
 find_package(ouster_msgs REQUIRED)
 find_package(PCL REQUIRED COMPONENTS common)
 find_package(jsoncpp REQUIRED)
+find_package(rdv_msgs REQUIRED)
+find_package(rdv_vehicle_interface_base REQUIRED)
 
 include_directories(
   include

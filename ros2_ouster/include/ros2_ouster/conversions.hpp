@@ -30,6 +30,7 @@
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "tf2/LinearMath/Transform.h"
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include "rdv_vehicle_interface_base/timestamp_translator.h"
 
 #include "ouster_msgs/msg/metadata.hpp"
 
@@ -191,7 +192,8 @@ inline sensor_msgs::msg::PointCloud2 toMsg(
   const pcl::PointCloud<ouster_ros::Point> & cloud,
   const std::chrono::nanoseconds timestamp,
   const std::string & frame,
-  const uint64_t override_ts)
+  const uint64_t override_ts,
+  TimestampTranslator& timestamp_translator)
 {
   sensor_msgs::msg::PointCloud2 msg{};
   pcl::toROSMsg(cloud, msg);
