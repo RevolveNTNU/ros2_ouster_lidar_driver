@@ -50,6 +50,7 @@ set(dependencies
   ouster_msgs
   tf2_geometry_msgs
   pcl_conversions
+  rdv_vehicle_interface_base 
 )
 
 add_library(${library_name} SHARED

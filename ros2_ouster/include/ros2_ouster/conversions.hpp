@@ -192,8 +192,7 @@ inline sensor_msgs::msg::PointCloud2 toMsg(
   const pcl::PointCloud<ouster_ros::Point> & cloud,
   const std::chrono::nanoseconds timestamp,
   const std::string & frame,
-  const uint64_t override_ts,
-  TimestampTranslator& timestamp_translator)
+  const uint64_t override_ts)
 {
   sensor_msgs::msg::PointCloud2 msg{};
   pcl::toROSMsg(cloud, msg);

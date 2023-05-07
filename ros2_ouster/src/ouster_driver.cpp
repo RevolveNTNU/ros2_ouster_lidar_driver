@@ -117,8 +117,15 @@ void OusterDriver::onConfigure()
   _metadata_srv = this->create_service<ouster_msgs::srv::GetMetadata>(
     "~/get_metadata", std::bind(&OusterDriver::getMetadata, this, _1, _2, _3));
 
+  rclcpp::Client<rdv_msgs::srv::PpsCounterReset>::SharedPtr pps_second_counter_reset_client_ =
+    this->create_client<rdv_msgs::srv::PpsCounterReset>("/vehicle_interface/reset_pps_counter");
+
   _full_rotation_accumulator = std::make_shared<sensor::FullRotationAccumulator>(
-    _sensor->getMetadata(), _sensor->getPacketFormat());
+    _sensor->getMetadata(), _sensor->getPacketFormat(), pps_second_counter_reset_client_);
+
+   
+   _pps_second_reset_srv = this->create_service<std_srvs::srv::Trigger>(
+    "/lidar_driver/pps_reset_client_trigger", std::bind(&sensor::FullRotationAccumulator::trigger_reset_pps_second_counter, _full_rotation_accumulator, _1, _2));
 
   if (_use_system_default_qos) {
     RCLCPP_INFO(
