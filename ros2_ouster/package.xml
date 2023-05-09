@@ -26,6 +26,8 @@
   <depend>pcl_conversions</depend>
   <depend>libpcl-all</depend>
   <depend>libtins-dev</depend>
+  <depend>rdv_vehicle_interface_base</depend>
+  <depend>rdv_msgs</depend>
 
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_lint_auto</test_depend>

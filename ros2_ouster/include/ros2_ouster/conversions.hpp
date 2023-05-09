@@ -30,6 +30,7 @@
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "tf2/LinearMath/Transform.h"
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include "rdv_vehicle_interface_base/timestamp_translator.h"
 
 #include "ouster_msgs/msg/metadata.hpp"
 

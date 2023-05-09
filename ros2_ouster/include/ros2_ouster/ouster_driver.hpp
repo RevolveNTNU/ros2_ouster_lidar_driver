@@ -144,6 +144,7 @@ private:
 
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr _reset_srv;
   rclcpp::Service<ouster_msgs::srv::GetMetadata>::SharedPtr _metadata_srv;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr _pps_second_reset_srv;
 
   std::unique_ptr<SensorInterface> _sensor;
   std::multimap<ouster::sensor::client_state,
