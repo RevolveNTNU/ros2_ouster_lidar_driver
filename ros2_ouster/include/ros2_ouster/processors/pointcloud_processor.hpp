@@ -113,7 +113,7 @@ public:
     _pub->publish(
       ros2_ouster::toMsg(
         *(_filter_zero_points ? _cloud_filtered : _cloud),
-        _fullRotationAccumulator->getTimestamp(),
+        _fullRotationAccumulator->getTimestampRos(),
         _frame, override_ts));
 
     RCLCPP_DEBUG(

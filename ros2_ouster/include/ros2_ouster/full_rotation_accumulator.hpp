@@ -43,6 +43,7 @@ public:
     const ouster::sensor::packet_format & pf,
     rclcpp::Client<rdv_msgs::srv::PpsCounterReset>::SharedPtr pps_reset_client)
   : _batchReady(false), _pf(pf), _packets_accumulated(0), _pps_reset_client(pps_reset_client)
+  , _timestamp_translator({std::chrono::seconds(37), 100, TimestampTranslator::Method::kPpsToSystemClock})
   {
     _batch = std::make_unique<ouster::ScanBatcher>(mdata.format.columns_per_frame, _pf);
     _ls = std::make_shared<ouster::LidarScan>(
@@ -80,8 +81,19 @@ public:
     if (!_batchReady) {
       throw ros2_ouster::OusterDriverException("Full rotation not accumulated.");
     }
-
     return _timestamp;
+  }
+
+  /**
+   * @brief Returns the ready timestamp in ROS time. If the timestamp is not ready it will
+   * throw an exception
+   */
+  rclcpp::Time getTimestampRos()
+  {
+    if (!_batchReady) {
+      throw ros2_ouster::OusterDriverException("Full rotation not accumulated.");
+    }
+    return _timestamp_translator.getRosTime(0ns, _timestamp);
   }
 
   /**
@@ -149,10 +161,7 @@ private:
   ouster::sensor::packet_format _pf;
 
   bool _has_reset_pps_counter;
-  TimestampTranslator _timestamp_translator {
-    {std::chrono::seconds{2}, 1,
-    TimestampTranslator::Method::kPpsToSystemClock}
-  };
+  TimestampTranslator _timestamp_translator;
   rclcpp::Client<rdv_msgs::srv::PpsCounterReset>::SharedPtr _pps_reset_client;
 
   uint64_t _packets_accumulated = 0;
