@@ -105,6 +105,9 @@ public:
   void onCleanup() override;
 
 private:
+  rclcpp::Time _last_receival;
+  double _timeout_duration;
+  
   /**
   * @brief Thread function to process data from the UDP socket
   */

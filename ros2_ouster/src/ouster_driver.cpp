@@ -38,7 +38,7 @@ using namespace std::chrono_literals;
 OusterDriver::OusterDriver(
   std::unique_ptr<SensorInterface> sensor,
   const rclcpp::NodeOptions & options)
-: LifecycleInterface("OusterDriver", options), _sensor{std::move(sensor)}
+: LifecycleInterface("OusterDriver", options), _sensor{std::move(sensor)}, _last_receival(0,0)
 {
   // Declare parameters for configuring the _driver_
   this->declare_parameter("sensor_frame", std::string("laser_sensor_frame"));
@@ -46,6 +46,7 @@ OusterDriver::OusterDriver(
   this->declare_parameter("imu_frame", std::string("imu_data_frame"));
   this->declare_parameter("use_system_default_qos", false);
   this->declare_parameter("proc_mask", std::string("IMG|PCL|IMU|SCAN"));
+  this->declare_parameter("timeout_duration", 3.0);
 
   // Declare parameters used across ALL _sensor_ implementations
   this->declare_parameter<std::string>("lidar_ip","10.5.5.96");
@@ -54,6 +55,7 @@ OusterDriver::OusterDriver(
   this->declare_parameter("lidar_port", 7502);
   this->declare_parameter("lidar_mode", std::string("512x10"));
   this->declare_parameter("timestamp_mode", std::string("TIME_FROM_INTERNAL_OSC"));
+
 }
 
 OusterDriver::~OusterDriver() = default;
@@ -66,6 +68,7 @@ void OusterDriver::onConfigure()
   _imu_data_frame = get_parameter("imu_frame").as_string();
   _use_system_default_qos = get_parameter("use_system_default_qos").as_bool();
   _proc_mask = ros2_ouster::toProcMask(get_parameter("proc_mask").as_string());
+  _timeout_duration = get_parameter("timeout_duration").as_double();
 
   // Get parameters used across ALL _sensor_ implementations. Parameters unique
   // a specific Sensor implementation are "getted" in the configure() function
@@ -268,8 +271,15 @@ void OusterDriver::receiveData()
       bool got_lidar = _sensor->readLidarPacket(state, _lidar_packet_buf->tail());
       bool got_imu = _sensor->readImuPacket(state, _imu_packet_buf->tail());
 
+      // Check timeout
+      rclcpp::Time now = this->get_clock()->now();
+      if ((now.seconds() - _last_receival.seconds() > _timeout_duration) && _last_receival.seconds() > 0) {
+        rclcpp::shutdown();
+      }
+
       // If we got some data, push to ringbuffer and signal processing thread
       if (got_lidar || got_imu) {
+        _last_receival = now;
         if (got_lidar) {
           // If the ringbuffer is full, this means the processing thread is running too slow to
           // process all frames. Therefore, we push to it anyway, discarding all (old) data

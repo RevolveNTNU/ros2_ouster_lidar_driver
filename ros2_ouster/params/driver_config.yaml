@@ -9,6 +9,10 @@ ouster_driver:
     laser_frame: os_sensor
     imu_frame: os_imu
 
+    # Amount of time to wait until shutdown when the
+    # data stream stops
+    timeout_duration: 3.0 # [s]
+
     # if False, data are published with sensor data QoS. This is preferrable
     # for production but default QoS is needed for rosbag.
     # See: https://github.com/ros2/rosbag2/issues/125
