@@ -125,7 +125,7 @@ void OusterDriver::onConfigure()
 
    
    _pps_second_reset_srv = this->create_service<std_srvs::srv::Trigger>(
-    "/lidar_driver/pps_reset_client_trigger", std::bind(&sensor::FullRotationAccumulator::trigger_reset_pps_second_counter, _full_rotation_accumulator, _1, _2));
+    "/lidar_driver/reset_pps_counter_trigger", std::bind(&sensor::FullRotationAccumulator::trigger_reset_pps_second_counter, _full_rotation_accumulator, _1, _2));
 
   if (_use_system_default_qos) {
     RCLCPP_INFO(
