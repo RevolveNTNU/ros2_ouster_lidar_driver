@@ -1,4 +1,4 @@
-ouster_driver:
+/**:
   ros__parameters:
     lidar_ip: os-992206000999.local
     computer_ip: 169.254.99.99
