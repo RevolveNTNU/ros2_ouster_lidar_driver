@@ -1,4 +1,4 @@
-/**:
+ouster_driver:
   ros__parameters:
     lidar_ip: os-992206000999.local
     computer_ip: 169.254.99.99
@@ -12,6 +12,9 @@
     # Amount of time to wait until shutdown when the
     # data stream stops
     timeout_duration: 3.0 # [s]
+
+    # Lidar temperature sending frequency
+    temperature_frequency: 1.0 # [s]
 
     # if False, data are published with sensor data QoS. This is preferrable
     # for production but default QoS is needed for rosbag.
