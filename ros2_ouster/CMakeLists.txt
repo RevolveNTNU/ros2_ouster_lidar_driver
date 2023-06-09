@@ -24,6 +24,7 @@ find_package(PCL REQUIRED COMPONENTS common)
 find_package(jsoncpp REQUIRED)
 find_package(rdv_msgs REQUIRED)
 find_package(rdv_vehicle_interface_base REQUIRED)
+find_package(CURL REQUIRED)
 
 include_directories(
   include
@@ -50,7 +51,8 @@ set(dependencies
   ouster_msgs
   tf2_geometry_msgs
   pcl_conversions
-  rdv_vehicle_interface_base 
+  rdv_vehicle_interface_base
+  CURL
 )
 
 add_library(${library_name} SHARED
