@@ -156,6 +156,9 @@ private:
   rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr _pps_second_reset_srv;
 
   rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr _lidar_temperature_pub;
+  rclcpp::TimerBase::SharedPtr _lidar_temperature_sample_timer;
+
+  rclcpp::CallbackGroup::SharedPtr _temperature_callback_group;
 
   std::unique_ptr<SensorInterface> _sensor;
   std::multimap<ouster::sensor::client_state,

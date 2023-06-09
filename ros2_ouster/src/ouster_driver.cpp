@@ -28,6 +28,7 @@
 #include "ros2_ouster/client/types.h"
 #include "ros2_ouster/sensor.hpp"
 #include "ros2_ouster/sensor_tins.hpp"
+#include "rclcpp/callback_group.hpp"
 
 namespace ros2_ouster
 {
@@ -49,6 +50,7 @@ OusterDriver::OusterDriver(
   this->declare_parameter("use_system_default_qos", false);
   this->declare_parameter("proc_mask", std::string("IMG|PCL|IMU|SCAN"));
   this->declare_parameter("timeout_duration", 3.0);
+  this->declare_parameter("temperature_sample_frequency", 0.1);
 
   // Declare parameters used across ALL _sensor_ implementations
   this->declare_parameter<std::string>("lidar_ip","10.5.5.96");
@@ -58,6 +60,7 @@ OusterDriver::OusterDriver(
   this->declare_parameter("lidar_mode", std::string("512x10"));
   this->declare_parameter("timestamp_mode", std::string("TIME_FROM_INTERNAL_OSC"));
 
+  _temperature_callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
 }
 
 OusterDriver::~OusterDriver() = default;
@@ -131,6 +134,10 @@ void OusterDriver::onConfigure()
   _pps_second_reset_srv = this->create_service<std_srvs::srv::Trigger>(
   "/lidar_driver/reset_pps_counter_trigger", std::bind(&sensor::FullRotationAccumulator::trigger_reset_pps_second_counter, _full_rotation_accumulator, _1, _2));
 
+  double temperature_sample_frequency = this->get_parameter("temperature_sample_frequency").as_double();
+  _lidar_temperature_pub = this->create_publisher<std_msgs::msg::UInt8>("/sensor/lidar_0/temperature", 10);
+  _lidar_temperature_sample_timer = this->create_wall_timer(1s * 1/temperature_sample_frequency, std::bind(&OusterDriver::sendTemperature, this), _temperature_callback_group);
+
   if (_use_system_default_qos) {
     RCLCPP_INFO(
       this->get_logger(), "Using system defaults QoS for sensor data");
@@ -147,9 +154,6 @@ void OusterDriver::onConfigure()
   _tf_b = std::make_unique<tf2_ros::StaticTransformBroadcaster>(
     shared_from_this());
   broadcastStaticTransforms(_sensor->getMetadata());
-
-  double temperature_frequency = this->get_parameter("temperature_frequency").as_double();
-  _lidar_temperature_pub = this->create_publisher<std_msgs::msg::UInt8>("_/sensor/lidar_0/temperature", 10);
 }
 
 void OusterDriver::onActivate()
@@ -366,7 +370,6 @@ void OusterDriver::getMetadata(
 }
 
 void OusterDriver::sendTemperature() {
-
   static std::string lidar_ip_address = get_parameter("lidar_ip").as_string();
   std::string url = lidar_ip_address + "/api/v1/sensor/telemetry";
   std::string response;

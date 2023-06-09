@@ -14,7 +14,7 @@ ouster_driver:
     timeout_duration: 3.0 # [s]
 
     # Lidar temperature sending frequency
-    temperature_frequency: 1.0 # [s]
+    temperature_sample_frequency: 0.1 # [s]
 
     # if False, data are published with sensor data QoS. This is preferrable
     # for production but default QoS is needed for rosbag.
