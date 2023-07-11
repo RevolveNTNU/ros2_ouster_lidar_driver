@@ -13,6 +13,9 @@ ouster_driver:
     # data stream stops
     timeout_duration: 3.0 # [s]
 
+    # Lidar temperature sending frequency
+    temperature_sample_frequency: 0.1 # [s]
+
     # if False, data are published with sensor data QoS. This is preferrable
     # for production but default QoS is needed for rosbag.
     # See: https://github.com/ros2/rosbag2/issues/125

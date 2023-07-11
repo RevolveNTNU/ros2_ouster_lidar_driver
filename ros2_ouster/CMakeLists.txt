@@ -22,6 +22,9 @@ find_package(pcl_conversions REQUIRED)
 find_package(ouster_msgs REQUIRED)
 find_package(PCL REQUIRED COMPONENTS common)
 find_package(jsoncpp REQUIRED)
+find_package(rdv_msgs REQUIRED)
+find_package(rdv_vehicle_interface_base REQUIRED)
+find_package(CURL REQUIRED)
 
 include_directories(
   include
@@ -48,6 +51,11 @@ set(dependencies
   ouster_msgs
   tf2_geometry_msgs
   pcl_conversions
+<<<<<<< HEAD
+=======
+  rdv_vehicle_interface_base
+  CURL
+>>>>>>> c810ed1 (Feature/lidar temperature (#2))
 )
 
 add_library(${library_name} SHARED

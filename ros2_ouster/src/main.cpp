@@ -23,7 +23,11 @@ int main(int argc, char ** argv)
 
   auto node = std::make_shared<ros2_ouster::Driver>(options);
 
-  rclcpp::spin(node->get_node_base_interface());
+  using rclcpp::executors::MultiThreadedExecutor;
+  MultiThreadedExecutor executor;
+
+  executor.add_node(node->get_node_base_interface());
+  executor.spin();
 
   rclcpp::shutdown();
   return 0;
