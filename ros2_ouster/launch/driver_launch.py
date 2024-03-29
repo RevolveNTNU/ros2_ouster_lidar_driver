@@ -40,7 +40,7 @@ def generate_launch_description():
     params_declare = DeclareLaunchArgument('params_file',
                                            default_value=os.path.join(
                                                share_dir, 'params', 'driver_config.yaml'),
-                                           description='FPath to the ROS2 parameters file to use.')
+                                           description='Path to the ROS2 parameters file to use.')
 
     shutdown_action = Shutdown()
 
@@ -53,6 +53,7 @@ def generate_launch_description():
                                 arguments=['--ros-args', '--log-level', 'INFO'],
                                 namespace='/',
                                 on_exit=[shutdown_action],
+                                prefix="taskset -c 1"
                                 )
 
     configure_event = EmitEvent(

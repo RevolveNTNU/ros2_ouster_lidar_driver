@@ -133,7 +133,7 @@ void OusterDriver::onConfigure()
   } else {
     _data_processors = ros2_ouster::createProcessors(
       shared_from_this(), _sensor->getMetadata(), _imu_data_frame, _laser_data_frame,
-      rclcpp::SensorDataQoS(), _sensor->getPacketFormat(), _full_rotation_accumulator, _proc_mask);
+      10, _sensor->getPacketFormat(), _full_rotation_accumulator, _proc_mask);
   }
 
   _tf_b = std::make_unique<tf2_ros::StaticTransformBroadcaster>(
