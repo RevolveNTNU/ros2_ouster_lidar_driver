@@ -22,8 +22,10 @@ find_package(pcl_conversions REQUIRED)
 find_package(ouster_msgs REQUIRED)
 find_package(PCL REQUIRED COMPONENTS common)
 
-if (NOT TARGET JsonCpp::JsonCpp)
+if(NOT TARGET JsonCpp::JsonCpp)
   find_package(jsoncpp REQUIRED)
+elseif(NOT TARGET jsoncpp_lib)
+  add_library(jsoncpp_lib ALIAS JsonCpp::JsonCpp)
 endif()
 
 include_directories(
@@ -70,7 +72,7 @@ ament_target_dependencies(${library_name}
 )
 
 target_link_libraries(${library_name}
-  JsonCpp::JsonCpp
+  jsoncpp_lib
   tins
   ${PCL_LIBRARIES}
 )
