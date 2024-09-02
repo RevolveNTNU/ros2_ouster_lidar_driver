@@ -44,6 +44,8 @@ def generate_launch_description():
 
     shutdown_action = Shutdown()
 
+    shutdown_action = Shutdown()
+
     driver_node = LifecycleNode(package='ros2_ouster',
                                 executable='ouster_driver',
                                 name=node_name,

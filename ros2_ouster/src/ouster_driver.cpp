@@ -16,6 +16,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <json/json.h>
+#include <curl/curl.h>
 
 #include "rclcpp/qos.hpp"
 #include "ros2_ouster/exception.hpp"
@@ -26,6 +28,7 @@
 #include "ros2_ouster/client/types.h"
 #include "ros2_ouster/sensor.hpp"
 #include "ros2_ouster/sensor_tins.hpp"
+#include "rclcpp/callback_group.hpp"
 
 namespace ros2_ouster
 {
@@ -120,8 +123,18 @@ void OusterDriver::onConfigure()
   _metadata_srv = this->create_service<ouster_msgs::srv::GetMetadata>(
     "~/get_metadata", std::bind(&OusterDriver::getMetadata, this, _1, _2, _3));
 
+  rclcpp::Client<rdv_msgs::srv::PpsCounterReset>::SharedPtr pps_second_counter_reset_client_ =
+    this->create_client<rdv_msgs::srv::PpsCounterReset>("/vehicle_interface/reset_pps_counter");
+
   _full_rotation_accumulator = std::make_shared<sensor::FullRotationAccumulator>(
-    _sensor->getMetadata(), _sensor->getPacketFormat());
+    _sensor->getMetadata(), _sensor->getPacketFormat(), pps_second_counter_reset_client_);
+
+  _pps_second_reset_srv = this->create_service<std_srvs::srv::Trigger>(
+  "/lidar_driver/reset_pps_counter_trigger", std::bind(&sensor::FullRotationAccumulator::trigger_reset_pps_second_counter, _full_rotation_accumulator, _1, _2));
+
+  double temperature_sample_frequency = this->get_parameter("temperature_sample_frequency").as_double();
+  _lidar_temperature_pub = this->create_publisher<std_msgs::msg::UInt8>("/sensor/lidar_0/temperature", 10);
+  _lidar_temperature_sample_timer = this->create_wall_timer(1s * 1/temperature_sample_frequency, std::bind(&OusterDriver::sendTemperature, this), _temperature_callback_group);
 
   if (_use_system_default_qos) {
     RCLCPP_INFO(
@@ -354,4 +367,40 @@ void OusterDriver::getMetadata(
   }
 }
 
-}  // namespace ros2_ouster
+void OusterDriver::sendTemperature() {
+  static std::string lidar_ip_address = get_parameter("lidar_ip").as_string();
+  std::string url = lidar_ip_address + "/api/v1/sensor/telemetry";
+  std::string response;
+
+  static auto startup = std::chrono::steady_clock::now();
+  static auto prev_now = std::chrono::steady_clock::now();
+
+  CURL* curl = curl_easy_init();
+  if (curl)
+  {
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(
+        curl, CURLOPT_WRITEFUNCTION, +[](void* contents, size_t size, size_t nmemb, std::string* response) {
+          ((std::string*)response)->append((char*)contents, size * nmemb);
+          return size * nmemb;
+        });
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) return;
+    curl_easy_cleanup(curl);
+
+    Json::Value lidar_telemetry;
+    Json::Reader reader;
+
+    bool parse_successful = reader.parse(response.c_str(), lidar_telemetry);
+    if (!parse_successful) return;
+
+    std_msgs::msg::UInt8 msg;
+    msg.data = lidar_telemetry.get("internal_temperature_deg_c", 0).asInt();
+
+    _lidar_temperature_pub->publish(msg);
+  }
+}
+
+} // namespace ros2_ouster

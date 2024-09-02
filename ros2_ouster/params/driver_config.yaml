@@ -31,6 +31,7 @@ ouster_driver:
     #
     timestamp_mode: TIME_FROM_ROS_RECEPTION
 
+
     # Mask-like-string used to define the data processors that should be
     # activated upon startup of the driver. This will determine the topics
     # that are available for client applications to consume. The defacto

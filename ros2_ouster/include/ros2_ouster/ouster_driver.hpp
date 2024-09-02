@@ -19,6 +19,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include "std_msgs/msg/u_int8.hpp"
 
 #include "ros2_ouster/conversions.hpp"
 
@@ -145,8 +146,19 @@ private:
   */
   void processData();
 
+  /**
+   * @brief function for sending lidar temperature
+   */
+  void sendTemperature();
+
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr _reset_srv;
   rclcpp::Service<ouster_msgs::srv::GetMetadata>::SharedPtr _metadata_srv;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr _pps_second_reset_srv;
+
+  rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr _lidar_temperature_pub;
+  rclcpp::TimerBase::SharedPtr _lidar_temperature_sample_timer;
+
+  rclcpp::CallbackGroup::SharedPtr _temperature_callback_group;
 
   std::unique_ptr<SensorInterface> _sensor;
   std::multimap<ouster::sensor::client_state,

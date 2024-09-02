@@ -26,6 +26,7 @@ if (NOT TARGET JsonCpp::JsonCpp)
   find_package(jsoncpp REQUIRED)
 endif()
 
+
 include_directories(
   include
   ${PCL_INCLUDE_DIRS}
@@ -51,6 +52,8 @@ set(dependencies
   ouster_msgs
   tf2_geometry_msgs
   pcl_conversions
+  rdv_vehicle_interface_base
+  CURL
 )
 
 add_library(${library_name} SHARED
