@@ -52,7 +52,7 @@ public:
     const ouster::sensor::packet_format & pf)
   : DataProcessorInterface(), _node(node), _frame(frame), _pf(pf)
   {
-    _pub = node->create_publisher<sensor_msgs::msg::Imu>("imu", qos);
+    _pub = node->create_publisher<sensor_msgs::msg::Imu>("/sensor/imu_1", qos);
   }
 
   /**
